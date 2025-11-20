@@ -16,6 +16,7 @@ class ScoreManager:
     def load(self):
         self.scores.clear()
         if not os.path.exists(self.filename):
+            # 文件不存在，后续写入会自动创建
             return
         try:
             tree = ET.parse(self.filename)
@@ -23,19 +24,30 @@ class ScoreManager:
             for node in root.findall("score"):
                 name = node.find("name").text
                 date = node.find("date").text
-                score = int(node.find("point").text)
+                score_text = node.find("point").text
+                try:
+                    score = int(score_text)
+                except:
+                    score = 0
                 self.scores.append({'name': name, 'date': date, 'score': score})
         except Exception as e:
             print(f"加载排行榜时出错: {e}")
             self.scores = []
 
     def append_score(self, name, score):
-        if name=="":
-            name=self.username
+        # 强制分数为整数和安全用户名
+        if not name:
+            name = self.username if self.username else "?"
+        try:
+            score = int(score)
+        except:
+            score = 0
         date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         self.scores.append({'name': name, 'date': date, 'score': score})
-        self.scores.sort(key=lambda x: (-x['score'], x['date']))
-        # 自动创建xml节点
+        # 只排序有数字分数的项，且KeyError安全
+        safe_scores = [s for s in self.scores if isinstance(s.get('score', None), int)]
+        self.scores = sorted(safe_scores, key=lambda x: (-x['score'], x['date']))
+        # 写到XML，不包含任何'game'字段
         root = ET.Element("scores")
         for entry in self.scores:
             node = ET.SubElement(root, "score")
@@ -49,23 +61,20 @@ class ScoreManager:
         return self.scores
 
     def isLogined(self):
-        return self.username is not None
+        return bool(self.username)
 
     def login(self, screen=None, width=800, height=600):
         if self.isLogined():
-            return
-        # Use SimHei or other fallback
+            return self.username
         font = pygame.font.SysFont("SimHei", 22)
         username = ""
         done = False
         clock = pygame.time.Clock()
         hint = font.render("请输入用户名, 按回车结束：", True, (255, 255, 0))
-        # 允许字母数字下划线等
         input_charset = string.ascii_letters + string.digits + "_-."
         while not done:
             screen.fill((30,30,30))
             screen.blit(hint, (width//2-220, height//2-60))
-            #screen.blit(hint, (0, height//2-60))
             text = font.render(username, True, (255,255,255))
             screen.blit(text, (width//2-150, height//2))
             pygame.display.flip()

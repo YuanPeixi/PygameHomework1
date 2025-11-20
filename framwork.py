@@ -121,6 +121,9 @@ class MainMenu(GameFramework):
 
     def add_score(self,score):
         self.score+=score
+    
+    def get_score(self):
+        return self.score
 
     def update(self):
         #In Update draw out game list and score
@@ -147,6 +150,7 @@ class GameManager:
         self.height=600
         self.games=[MainMenu()]
         self.running=False
+        self.score=0
         self.target=0 #The running game
 
     def __del__(self):
@@ -171,6 +175,7 @@ class GameManager:
                 self.running=False
             else:
                 self.games[self.target].run()
-                self.games[0].add_score(self.games[self.target].loop())
-        return self.games[0].score
+                self.score+=(self.games[self.target].loop())
+                self.games[0].score=self.score
+        return self.score
                 
