@@ -3,6 +3,7 @@ import snake
 import ScoreBoard
 from ScoreManager import *
 import stage_eternal_night2 as stage_eternal_night #Switch to new version
+import GuessNumber
 
 class TestGame(GameFramework):
     def __init__(self,width=800,height=600):
@@ -27,10 +28,11 @@ if __name__=="__main__":
         score_manager.login(screen)
     game=TestGame()
     pygame.display.quit()
-    game_manger.register_game(game)
-    game_manger.register_game(snake.Snake())
     game_manger.register_game(ScoreBoard.ScoreBoard(score_manager))
+
+    game_manger.register_game(snake.Snake())
     game_manger.register_game(stage_eternal_night.TouhouStage())
+    game_manger.register_game(GuessNumber.GuessNumber())
     game_manger.run()
     
     score_manager.append_score("",game_manger.loop())

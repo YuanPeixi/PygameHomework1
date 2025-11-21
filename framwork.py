@@ -41,38 +41,38 @@ class GameFramework:
 
     # Extended event handlers with full event object access
     def on_key_down_ex(self, event):
-        """Extended key down handler with access to full event object.
-        Default implementation calls on_key_down for backward compatibility."""
+        """- Extended focus loss handler with access to full event object.
+        - Default implementation calls on_focus_loss for backward compatibility."""
         self.on_key_down(event.key)
     
     def on_key_up_ex(self, event):
-        """Extended key up handler with access to full event object.
-        Default implementation calls on_key_up for backward compatibility."""
+        """- Extended focus loss handler with access to full event object.
+        - Default implementation calls on_focus_loss for backward compatibility."""
         self.on_key_up(event.key)
     
     def on_mouse_down_ex(self, event):
-        """Extended mouse down handler with access to full event object.
-        Default implementation calls on_mouse_down for backward compatibility."""
+        """- Extended focus loss handler with access to full event object.
+        - Default implementation calls on_focus_loss for backward compatibility."""
         self.on_mouse_down(event.pos, event.button)
     
     def on_mouse_up_ex(self, event):
-        """Extended mouse up handler with access to full event object.
-        Default implementation calls on_mouse_up for backward compatibility."""
+        """- Extended focus loss handler with access to full event object.
+        - Default implementation calls on_focus_loss for backward compatibility."""
         self.on_mouse_up(event.pos, event.button)
     
     def on_mouse_move_ex(self, event):
-        """Extended mouse move handler with access to full event object.
-        Default implementation calls on_mouse_move for backward compatibility."""
+        """- Extended focus loss handler with access to full event object.
+        - Default implementation calls on_focus_loss for backward compatibility."""
         self.on_mouse_move(event.pos)
     
     def on_focus_get_ex(self, event):
-        """Extended focus gain handler with access to full event object.
-        Default implementation calls on_focus_get for backward compatibility."""
+        """- Extended focus loss handler with access to full event object.
+        - Default implementation calls on_focus_loss for backward compatibility."""
         self.on_focus_get()
     
     def on_focus_loss_ex(self, event):
-        """Extended focus loss handler with access to full event object.
-        Default implementation calls on_focus_loss for backward compatibility."""
+        """- Extended focus loss handler with access to full event object.
+        - Default implementation calls on_focus_loss for backward compatibility."""
         self.on_focus_loss()
 
     def on_key_down(self,key):
@@ -85,11 +85,17 @@ class GameFramework:
         return self.key_status.get(key,False)
     
     def update(self):
-        """Override this method to implement game logic updates. No frame control here.(Framework controls it 60FPS) """
+        """
+        - Override this method to implement game logic updates. 
+        - No frame control here.(Framework controls it 60FPS) 
+        """
         pass
     
     def draw(self):
-        """Override this method to implement rendering. Called after update. Note: The latter it writes the upper layer it draws(Upper layer covers lower)"""
+        """
+        - Override this method to implement rendering. Called after update. 
+        - Note: The latter it writes the upper layer it draws(Upper layer covers lower)
+        """
         pass
         
     def loop(self):
