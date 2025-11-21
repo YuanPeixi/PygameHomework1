@@ -8,6 +8,7 @@ class GameFramework:
         self.width=width
         self.height=height
         self.score=0
+        self._fonts={}  # Font cache for performance
         pass
     def run(self):
         self.running=True
@@ -18,11 +19,18 @@ class GameFramework:
     def get_name(self):
         return self.name 
 
+    def _get_font(self, font_name, size):
+        """Get or create a cached font object."""
+        key = (font_name, size)
+        if key not in self._fonts:
+            self._fonts[key] = pygame.font.SysFont(font_name, size)
+        return self._fonts[key]
+
     def text_out(self,text,pos=(0,0),size=24,color=(255,255,255),font="SimHei"):
-        font=pygame.font.SysFont(font,size)
-        text_surf=font.render(text,True,color)
-        self.screen.blit(text_surf,pos)
-        pygame.display.flip()
+        """Render text to screen using cached fonts. Does not flip display."""
+        font_obj = self._get_font(font, size)
+        text_surf = font_obj.render(text, True, color)
+        self.screen.blit(text_surf, pos)
         
     def on_mouse_down(self,point,button):
         pass
@@ -30,6 +38,42 @@ class GameFramework:
         pass
     def on_mouse_up(self,point,button):
         pass
+
+    # Extended event handlers with full event object access
+    def on_key_down_ex(self, event):
+        """Extended key down handler with access to full event object.
+        Default implementation calls on_key_down for backward compatibility."""
+        self.on_key_down(event.key)
+    
+    def on_key_up_ex(self, event):
+        """Extended key up handler with access to full event object.
+        Default implementation calls on_key_up for backward compatibility."""
+        self.on_key_up(event.key)
+    
+    def on_mouse_down_ex(self, event):
+        """Extended mouse down handler with access to full event object.
+        Default implementation calls on_mouse_down for backward compatibility."""
+        self.on_mouse_down(event.pos, event.button)
+    
+    def on_mouse_up_ex(self, event):
+        """Extended mouse up handler with access to full event object.
+        Default implementation calls on_mouse_up for backward compatibility."""
+        self.on_mouse_up(event.pos, event.button)
+    
+    def on_mouse_move_ex(self, event):
+        """Extended mouse move handler with access to full event object.
+        Default implementation calls on_mouse_move for backward compatibility."""
+        self.on_mouse_move(event.pos)
+    
+    def on_focus_get_ex(self, event):
+        """Extended focus gain handler with access to full event object.
+        Default implementation calls on_focus_get for backward compatibility."""
+        self.on_focus_get()
+    
+    def on_focus_loss_ex(self, event):
+        """Extended focus loss handler with access to full event object.
+        Default implementation calls on_focus_loss for backward compatibility."""
+        self.on_focus_loss()
 
     def on_key_down(self,key):
         self.key_status[key]=True
@@ -41,30 +85,39 @@ class GameFramework:
         return self.key_status.get(key,False)
     
     def update(self):
+        """Override this method to implement game logic updates."""
+        pass
+    
+    def draw(self):
+        """Override this method to implement rendering. Called after update."""
         pass
         
     def loop(self):
-        #Mainly Message Distributoin
+        #Mainly Message Distribution
+        clock = pygame.time.Clock()
         while self.running:
             for event in pygame.event.get():
-                if event==pygame.QUIT:
+                if event.type==pygame.QUIT:
                     self.running=False
                 if event.type==pygame.KEYDOWN:
-                    self.on_key_down(event.key)
+                    self.on_key_down_ex(event)
                 if event.type==pygame.KEYUP:
-                    self.on_key_up(event.key)
+                    self.on_key_up_ex(event)
                 if event.type==pygame.MOUSEBUTTONDOWN:
-                    self.on_mouse_down(event.pos,event.button)
+                    self.on_mouse_down_ex(event)
                 if event.type==pygame.MOUSEBUTTONUP:
-                    self.on_mouse_up(event.pos,event.button)
+                    self.on_mouse_up_ex(event)
                 if event.type==pygame.MOUSEMOTION:
-                    self.on_mouse_move(event.pos)
+                    self.on_mouse_move_ex(event)
                 if event.type==pygame.ACTIVEEVENT:
                     if event.gain:
-                        self.on_focus_get()
+                        self.on_focus_get_ex(event)
                     else:
-                        self.on_focus_loss()
+                        self.on_focus_loss_ex(event)
             self.update()
+            self.draw()
+            pygame.display.flip()
+            clock.tick(60)
         pygame.display.quit()
         return self.score
     
