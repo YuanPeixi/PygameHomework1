@@ -97,7 +97,7 @@ class GameFramework:
         clock = pygame.time.Clock()
         while self.running:
             for event in pygame.event.get():
-                if event==pygame.QUIT:
+                if event.type==pygame.QUIT:
                     self.running=False
                 if event.type==pygame.KEYDOWN:
                     self.on_key_down_ex(event)
