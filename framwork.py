@@ -85,11 +85,11 @@ class GameFramework:
         return self.key_status.get(key,False)
     
     def update(self):
-        """Override this method to implement game logic updates."""
+        """Override this method to implement game logic updates. No frame control here.(Framework controls it 60FPS) """
         pass
     
     def draw(self):
-        """Override this method to implement rendering. Called after update."""
+        """Override this method to implement rendering. Called after update. Note: The latter it writes the upper layer it draws(Upper layer covers lower)"""
         pass
         
     def loop(self):

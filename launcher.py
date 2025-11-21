@@ -2,7 +2,7 @@ from framwork import *
 import snake
 import ScoreBoard
 from ScoreManager import *
-import stage_eternal_night
+import stage_eternal_night2 as stage_eternal_night #Switch to new version
 
 class TestGame(GameFramework):
     def __init__(self,width=800,height=600):
