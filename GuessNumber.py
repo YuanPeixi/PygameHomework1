@@ -12,7 +12,7 @@ class GuessNumber(GameFramework):
     - self.score 在结束时设置，GameManager 可收集并传入 ScoreManager
     """
 
-    def __init__(self, low=1, high=200, max_attempts=5, width=800, height=400):
+    def __init__(self, low=1, high=200, max_attempts=5, width=1200, height=400):
         super().__init__("猜数字", width, height)
         self.low = low
         self.high = high
@@ -267,7 +267,7 @@ class GuessNumber(GameFramework):
         self.text_out(input_display, (input_box.x + 8, input_box.y + 6), size=28, color=(255,255,180))
 
         # 最近一条消息
-        self.text_out(self.message, (30, 220), size=20, color=(200,230,200))
+        self.text_out(self.message, (0, 220), size=20, color=(200,230,200))
 
         # 历史记录（最多显示最近 6 条）
         hist_y = 260
