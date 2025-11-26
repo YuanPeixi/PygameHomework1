@@ -41,7 +41,8 @@ class TouhouStage(GameFramework):
     def load_images(self):
         # 尝试加载资源，若不存在则使用占位图，避免因文件缺失而崩溃
         try:
-            path_reimu = "Reimu.png"
+            #path_reimu = "Reimu.png"
+            path_reimu="EternalNight\\Reimu.png"
             if os.path.exists(path_reimu):
                 #img = pygame.image.load(path_reimu).convert_alpha()
                 img = pygame.image.load(path_reimu)
@@ -54,7 +55,7 @@ class TouhouStage(GameFramework):
             pygame.draw.circle(self.reimu_img, (200,200,40), (24,24), 22)
 
         try:
-            path_junko = "Junko.png"
+            path_junko = "EternalNight\\Junko.png"
             if os.path.exists(path_junko):
                 #img2 = pygame.image.load(path_junko).convert_alpha()
                 img2 = pygame.image.load(path_junko)

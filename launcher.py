@@ -1,9 +1,9 @@
 from framwork import *
-import snake
 import ScoreBoard
 from ScoreManager import *
-import stage_eternal_night2 as stage_eternal_night #Switch to new version
-import GuessNumber
+import GuessNumber.GuessNumber as GuessNumber
+import Snake.snake as snake
+import EternalNight.stage_eternal_night2 as stage_eternal_night
 
 class TestGame(GameFramework):
     def __init__(self,width=800,height=600):
@@ -30,6 +30,7 @@ if __name__=="__main__":
     game_manger.register_game(MainMenu.MainMenu2())
     game=TestGame()
     pygame.display.quit()
+    #game_manger.games[0]=MainMenu()
     game_manger.register_game(ScoreBoard.ScoreBoard(score_manager))
 
     game_manger.register_game(snake.Snake())

@@ -2,6 +2,16 @@
 
 本项目为Pygame框架下的综合小游戏与排行榜系统集合。你可以通过启动器选择不同游戏、查看排行榜、体验自定义关卡，并支持分数统计与用户名登记。
 
+## 项目说明
+- 现在项目正在修改目录规划
+    - framework.py
+    - launcher.py
+    - rank.xml
+    - Game1
+    - Game2
+    - ...
+
+
 ## 主要文件说明
 
 ### 1. `framework.py` 用法说明
@@ -15,6 +25,8 @@
     - `loop()`：主循环，每帧分发输入及刷新界面，退出循环时返回该轮得分（`self.score`）。
     - `on_key_down(key)` / `on_key_up(key)` / `on_mouse_down(pos,btn)` / ... ：可覆写用于自定义输入事件。
     - `text_out(text, pos, size, color, font)`：便捷文本绘制，支持直接渲染中文。
+    - `update()`：主要帧间更新
+    - `draw()`：帧绘制
     - `end()`：安全退出本轮，推荐在游戏结束条件调用。
 
 - `MainMenu(GameFramework)`：游戏选择菜单，负责展示所有已注册小游戏名称，响应数字键切换游戏。
