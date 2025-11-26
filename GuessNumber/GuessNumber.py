@@ -291,13 +291,14 @@ class GuessNumber(GameFramework):
                     final_msg = self.history[-1][1]
                 else:
                     final_msg = "恭喜你，猜对了！"
-                self.text_out(final_msg, (center_x-220, center_y-60), size=36, color=(180,255,180))
+                #self.text_out(final_msg, (center_x-220, center_y-60), size=36, color=(180,255,180))
+                self.text_out(final_msg, (120, center_y-60), size=36, color=(180,255,180))
                 self.text_out(f"得分: {self.score}", (center_x-80, center_y), size=28, color=(220,220,200))
             else:
                 # 失败
                 # 原控制台在最后失败时输出强烈台词，我们保留该台词（如果在提交时已设置 message 则显示）
                 final_msg = self.message or f"很遗憾，特种兵，你没有猜对。正确答案是{self.target}。"
-                self.text_out(final_msg, (center_x-300, center_y-60), size=28, color=(255,120,120))
+                self.text_out(final_msg, (0, center_y-60), size=28, color=(255,120,120))
                 self.text_out(f"得分: {self.score}", (center_x-80, center_y), size=28, color=(220,220,200))
 
             # 倒计时/提示
