@@ -4,6 +4,7 @@ from ScoreManager import *
 import GuessNumber.GuessNumber as GuessNumber
 import Snake.snake as snake
 import EternalNight.stage_eternal_night2 as stage_eternal_night
+from MainMenu.MainMenu import MainMenu2
 
 class TestGame(GameFramework):
     def __init__(self,width=800,height=600):
@@ -27,7 +28,7 @@ if __name__=="__main__":
     screen=pygame.display.set_mode((600,600))
     #while not score_manager.isLogined():
     #    score_manager.login(screen)
-    game_manger.register_game(MainMenu.MainMenu2())
+    game_manger.register_game(MainMenu2())
     game=TestGame()
     pygame.display.quit()
     #game_manger.games[0]=MainMenu()
