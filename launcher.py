@@ -4,6 +4,7 @@ from ScoreManager import *
 import GuessNumber.GuessNumber as GuessNumber
 import Snake.snake as snake
 import EternalNight.stage_eternal_night2 as stage_eternal_night
+from BTxin.BTxin_mini_game import su
 
 class TestGame(GameFramework):
     def __init__(self,width=800,height=600):
@@ -27,6 +28,7 @@ if __name__=="__main__":
     while not score_manager.isLogined():
         score_manager.login(screen)
     game=TestGame()
+    BTxin_mini_game=su()
     pygame.display.quit()
     #game_manger.games[0]=MainMenu()
     game_manger.register_game(ScoreBoard.ScoreBoard(score_manager))
@@ -34,6 +36,7 @@ if __name__=="__main__":
     game_manger.register_game(snake.Snake())
     game_manger.register_game(stage_eternal_night.TouhouStage())
     game_manger.register_game(GuessNumber.GuessNumber())
+    game_manger.register_game(BTxin_mini_game)
     game_manger.run()
     
     score_manager.append_score("",game_manger.loop())
