@@ -2,25 +2,25 @@ import pygame as pg
 import math
 import random
 from framwork import GameFramework
-from ScoreManager import ScoreManager
+# from ScoreManager import ScoreManager
 
 # 备用
 UP = (0, -1)
 DOWN = (0, 1)
 LEFT = (-1, 0)
 RIGHT = (1, 0)
-best_score = 0
 
 
 class su(GameFramework):
     def __init__(self, width=800, height=600):
         super().__init__("BTxin", width, height)
-        self.scoremanager = ScoreManager()
-        self.is_scoremanager = True
+        # self.score_tempmanager = ScoreManager()
+        # self.is_scoremanager = True
+        self.score = 0
         # 音效
         pg.mixer.init()
         self.boss_hit_sound = pg.mixer.Sound("PygameHomework1/BTxin/homo2.wav")
-        self.boss_death_sound = pg.mixer.Sound("PygameHomework1/BTxin/homo.wav")
+        self.player_death_sound = pg.mixer.Sound("PygameHomework1/BTxin/homo.wav")
         # 球的初始位置
         self.center = [width // 2, height // 2]
         # 初始方向
@@ -49,15 +49,24 @@ class su(GameFramework):
         self.image_duration_default = 60
         self.image = self.images[self.image_index]
 
-        self.health = 20
-        self.best_score = best_score
-        self.score = 0
+        self.health = 10
+        self.score_temp = 0
         self.font = pg.font.Font(None, 48)
 
         self.is_dead = False
         self.game_over_font = pg.font.Font(None, 128)
         self.game_over_text = None
         self.info_font = pg.font.Font(None, 24)
+        # 倒计时字体与计时器
+        self.countdown_font = pg.font.Font(None, 200)
+        self.death_countdown_timer = None
+
+        # reset 分数索引
+        self.reset_digits = [1, 1, 4, 5, 1, 4]
+        self.reset_digit_index = 0
+        # 胜利与计时器
+        self.has_won = False
+        self.win_countdown_timer = None
 
         # boss
         self.boss = Boss(self.width, self.height)
@@ -177,9 +186,9 @@ class su(GameFramework):
                 if self.boss.respawn_timer <= 0:
                     self.boss.dead = False
                     self.boss.maxhealth += 100
-                    self.health += 20
+                    self.health += 10
                     self.boss.health = self.boss.maxhealth
-                    # 重生时不再直接增加速度（速度增长在死亡时触发）
+                    # 重生时不再直接增加速度
                     self.set_image(0, duration=30)
         else:
             self.boss.update()
@@ -196,24 +205,54 @@ class su(GameFramework):
                 pass
             self.boss.wid += 5
             self.set_image(2, duration=0)
-            self.score += 114514
-            self.best_score = max(self.best_score, self.score)
+            # Boss 增加分数（0->1->11->114->1145->11451->114514）
+            try:
+                self.advance_score_sequence()
+            except Exception:
+                pass
+
+        # 启动胜利倒计时
+        if self.score_temp >= 114514 and not self.has_won:
+            self.has_won = True
+            self.win_countdown_timer = 5 * 60
 
         self.draw()
 
         # 角色死亡
         if self.health <= 0:
-            self.best_score = max(self.best_score, self.score)
-            if self.is_scoremanager:
-                self.scoremanager.append_score("BTxin", self.score)
-                self.is_scoremanager = False
-
-            if self.boss_death_sound:
-                self.boss_death_sound.play()
-            self.boss.wid += 10
             if not self.is_dead:
                 self.is_dead = True
-                self.game_over_text = self.game_over_font.render("GAME OVER", True, (255, 0, 0))
+                # 播放死亡音
+                if self.player_death_sound:
+                    try:
+                        self.player_death_sound.play()
+                    except Exception:
+                        pass
+                # 放大 boss
+                self.boss.wid += 600
+                # 启动倒计时
+                self.death_countdown_timer = 5 * 60
+
+            # 倒计时进行中
+            if self.death_countdown_timer is not None:
+                self.death_countdown_timer -= 1
+                if self.death_countdown_timer <= 0:
+                    # 结束游戏
+                    self.score = self.score_temp
+                    self.reset()
+                    self.end()
+
+        # 胜利倒计时
+        if self.has_won and self.win_countdown_timer is not None:
+            self.win_countdown_timer -= 1
+            self.health = 1145114
+            if self.win_countdown_timer <= 0:
+                try:
+                    self.score=self.score_temp
+                    self.reset()
+                except Exception:
+                    pass
+                self.end()
 
         return super().update()
 
@@ -238,55 +277,110 @@ class su(GameFramework):
         # boss
         boss_img_rect = scaled_img.get_rect(center=(self.boss.center[0], self.boss.center[1]))
         self.screen.blit(scaled_img, boss_img_rect)
-        if self.is_dead:
+        # 倒计时数字
+        if self.death_countdown_timer is not None:
+            secs = math.ceil(self.death_countdown_timer / 60.0)
+            countdown_surf = self.countdown_font.render(str(secs), True, (255, 0, 0))
+            countdown_rect = countdown_surf.get_rect(center=(self.width // 2, self.height // 2 - 80))
+            self.screen.blit(countdown_surf, countdown_rect)
+        # 胜利显示
+        if self.has_won and self.win_countdown_timer is not None:
+            win_surf = self.game_over_font.render("YOU WIN", True, (255, 215, 0))
+            win_rect = win_surf.get_rect(center=(self.width // 2, self.height // 2 - 160))
+            self.screen.blit(win_surf, win_rect)
+            win_secs = math.ceil(self.win_countdown_timer / 60.0)
+            win_count_surf = self.countdown_font.render(str(win_secs), True, (255, 255, 255))
+            win_count_rect = win_count_surf.get_rect(center=(self.width // 2, self.height // 2 - 40))
+            self.screen.blit(win_count_surf, win_count_rect)
+        elif self.is_dead and self.game_over_text is not None:
             game_over_rect = self.game_over_text.get_rect(center=(self.width // 2, 100))
             self.screen.blit(self.game_over_text, game_over_rect)
 
-        score_text = f"Score: {self.score} | Best: {self.best_score}"
+        score_text = f"Score: {self.score_temp}"
         score_surface = self.font.render(score_text, True, (255, 255, 255))  # 白色
         score_rect = score_surface.get_rect(center=(self.width // 2, self.height // 2))
         self.screen.blit(score_surface, score_rect)
 
     def reset(self):
-
+        # 位置与移动状态
         self.center = self.initial_center.copy()
         self.direction = self.initial_direction.copy()
         self._normalize_direction()
         self.speed = 0
         self.moving = True
-        self.health = 20
-        self.score = 0
+
+        # 角色状态
+        self.health = 10
         self.is_dead = False
         self.game_over_text = None
         self.image_index = 0
         self.image_timer = 0
 
-        # 重置Boss状态
+        # 分数与重置序列
+        self.score_temp = 0
+        self.reset_digits = [1, 1, 4, 5, 1, 4]
+        self.reset_digit_index = 0
+
+        # 重置胜利/倒计时状态
+        self.death_countdown_timer = None
+        self.has_won = False
+        self.win_countdown_timer = None
+
+        # Boss 状态重置
         self.boss.health = self.initial_boss_health
+        self.boss.maxhealth = 100
         self.boss.dead = False
         self.boss.respawn_timer = 0
         self.boss.center = [random.randint(0, self.width), random.randint(0, self.height)]
         self.boss.wid = 88
-        self.boss.maxhealth = 100
-        self.boss.reset_speed()
+        try:
+            self.boss.reset_speed()
+        except Exception:
+            pass
 
-        #
-        self.boss_death_sound.stop()
-        self.boss_hit_sound.stop()
-        self.is_scoremanager = True
-
-        # 重置攻击道具
+        # 攻击道具重置
         self.attackitem.center = [random.randint(0, self.width), random.randint(0, self.height)]
         self.attackitem.damage = self.initial_attack_damage
 
+        # 停止正在播放的音效（安全调用）
+        try:
+            if getattr(self, 'player_death_sound', None):
+                self.player_death_sound.stop()
+        except Exception:
+            pass
+        try:
+            if getattr(self, 'boss_hit_sound', None):
+                self.boss_hit_sound.stop()
+        except Exception:
+            pass
+
+    def advance_score_sequence(self):
+        # 隐藏倒计时
+        self.death_countdown_timer = None
+        try:
+            if self.reset_digit_index < len(self.reset_digits):
+                digit = self.reset_digits[self.reset_digit_index]
+                if self.score_temp == 0:
+                    self.score_temp = digit
+                else:
+                    self.score_temp = int(str(self.score_temp) + str(digit))
+                self.reset_digit_index += 1
+                # 胜利倒计时
+                if self.score_temp >= 114514 and not self.has_won:
+                    self.has_won = True
+                    self.win_countdown_timer = 5 * 60
+        except Exception:
+            pass
+
+    # def end(self):
+    #     return super().end()
+
     def on_key_down(self, key):
-        if key == pg.K_r:
-            self.reset()
-        # 退出游戏时暂停 boss death 声音
+        # 退出游戏时暂停死亡音
         if key == pg.K_ESCAPE:
-            if getattr(self, 'boss_death_sound', None):
+            if getattr(self, 'player_death_sound', None):
                 try:
-                    self.boss_death_sound.stop()
+                    self.player_death_sound.stop()
                 except Exception:
                     pass
         return super().on_key_down(key)
@@ -305,12 +399,11 @@ class Boss(GameFramework):
         self.center = [random.randint(0, width), random.randint(0, height)]
         self.velocity = [random.uniform(-3, 3), random.uniform(-3, 3)]
         self.change_direction_timer = 0
-        # 初始速度倍率设置为当前的三倍
         self.speed_multiplier = 3.0
         self.base_speed = 3.0
 
     def update(self):
-        # 每60帧改变一次方向
+        # 改变方向
         self.change_direction_timer -= 1
         if self.change_direction_timer <= 0:
             max_speed = self.base_speed * self.speed_multiplier
@@ -348,6 +441,14 @@ class attackitem(GameFramework):
         self.damage = 10
 
     def update(self):
-        a = random.randint(0, 100)
-        self.damage = a
-        return super().update()
+        temp = random.randint(0, 10)
+        if temp > 8:
+            self.damage = 114514
+        elif 5 <= temp <= 8:
+            self.damage = random.randint(114, 200)
+        else:
+            self.damage = random.randint(0, 114)
+        try:
+            return super().update()
+        except Exception:
+            return None
