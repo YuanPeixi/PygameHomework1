@@ -13,6 +13,7 @@ class Snake(GameFramework):
         self.snake = [[6, 10], [5, 10], [4, 10]]  # 初始身体，存储为[格x,格y]
         self.food = self.spawn_food()
         self.score = 0
+        self.finnal= 0
         self.last_move_time = 0
         self.interval = 120  # 毫秒间隔
 
@@ -33,7 +34,20 @@ class Snake(GameFramework):
         elif key == pygame.K_ESCAPE:
             self.end()
 
+    def finnal_screen(self):
+        self.finnal=1
+        pass
+
     def update(self):
+        if self.finnal>=3*60:
+            self.end()
+            return
+        
+        if self.finnal:
+            #No more update
+            self.finnal+=1
+            return
+
         now = pygame.time.get_ticks()
         if now - self.last_move_time < self.interval:
             return
@@ -52,12 +66,14 @@ class Snake(GameFramework):
 
         # 撞墙
         if not (0 <= head[0] < self.width // self.block_size) or not (0 <= head[1] < self.height // self.block_size):
-            self.end()
+            self.finnal_screen()
+            #self.end()
             return
 
         # 撞身体
         if head in self.snake:
-            self.end()
+            self.finnal_screen()
+            #self.end()
             return
 
         self.snake = [head] + self.snake
@@ -67,6 +83,7 @@ class Snake(GameFramework):
         else:
             self.snake.pop()
 
+    def draw(self):
         # 绘制
         self.screen.fill((30, 30, 30))
         # 画蛇
@@ -76,7 +93,18 @@ class Snake(GameFramework):
         pygame.draw.rect(self.screen, (255, 0, 0), (self.food[0]*self.block_size, self.food[1]*self.block_size, self.block_size, self.block_size))
         # 画分数
         self.text_out(f"Score: {self.score}", (10, 10), 30, (255, 255, 0), font="黑体")
-        pygame.display.flip()
+
+        if self.finnal:
+            rect=pygame.Surface((800,800))
+            rect.set_alpha(100)
+            self.screen.blit(rect,(0,0))
+            #pygame.draw.rect(self.screen,(0,0,0),(self.width,self.height))
+            self.text_out(f"Score:{self.score}",(self.width/2-40,self.height/2-40),36)
+            self.text_out(f"{(3-self.finnal//60)} Sec Back to Main Menu",(self.width*0.5-40,self.height*0.8),18)
+
+        #pygame.display.flip()
+        return super().draw()
+
 
     def run(self):
         self.reset()

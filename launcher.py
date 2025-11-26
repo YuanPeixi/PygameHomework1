@@ -4,6 +4,7 @@ from ScoreManager import *
 import GuessNumber.GuessNumber as GuessNumber
 import Snake.snake as snake
 import EternalNight.stage_eternal_night2 as stage_eternal_night
+from MainMenu.MainMenu3 import *
 
 class TestGame(GameFramework):
     def __init__(self,width=800,height=600):
@@ -19,13 +20,15 @@ class TestGame(GameFramework):
         self.score=1000
         super().end()
 
+import MainMenu
 #中文输入法导致游戏输入异常
 if __name__=="__main__":
     game_manger=GameManager()
     score_manager=ScoreManager()
     screen=pygame.display.set_mode((600,600))
-    while not score_manager.isLogined():
-        score_manager.login(screen)
+    #while not score_manager.isLogined():
+    #    score_manager.login(screen)
+    game_manger.register_game(MainMenu3())
     game=TestGame()
     pygame.display.quit()
     #game_manger.games[0]=MainMenu()
