@@ -8,6 +8,9 @@ class MainMenu2(GameFramework):
         self._fonts[("STFANGSO",36)]=pygame.font.Font("MainMenu\\STFANGSO.ttf",36)
         self.font_name="STFANGSO"
         self.games=[]
+        self.covers=[]
+        #标定封面的大小
+        #动画的起始
 
     def set_game_list(self,games):
         self.games=games
@@ -36,7 +39,9 @@ class MainMenu2(GameFramework):
 
     def update(self):
         #In Update draw out game list and score
-        #计算游戏Cover的位置并
+        #计算游戏Cover的位置并绘制图片
+        
+        self.image_out()
         pass
 
     def draw(self):

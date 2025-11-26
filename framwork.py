@@ -35,11 +35,11 @@ class GameFramework:
     def image_out(self, image, pos, size=None, center=False, alpha=None):
         """
         统一图片绘制接口
-        :param image: pygame.Surface 图片对象
-        :param pos: (x, y) 左上角坐标或中心坐标(center=True 时)
-        :param size: (宽, 高); 如果指定则自动缩放,否则保持图片原尺寸
-        :param center: 如果为True,pos为图片中心;否则为左上角
-        :param alpha: 若指定,设置整体不透明度(0-255)
+        - image: pygame.Surface 图片对象
+        - pos: (x, y) 左上角坐标或中心坐标(center=True 时)
+        - size: (宽, 高); 如果指定则自动缩放,否则保持图片原尺寸
+        - center: 如果为True,pos为图片中心;否则为左上角
+        - alpha: 若指定,设置整体不透明度(0-255)
         """
         surf = image
         if size is not None:
