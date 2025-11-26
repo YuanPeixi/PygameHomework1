@@ -228,7 +228,8 @@ class GameManager:
         pygame.init()
         self.width=800
         self.height=600
-        self.games=[MainMenu()]
+        #self.games=[MainMenu()]
+        self.games=[]
         self.running=False
         self.score=0
         self.target=0 #The running game
