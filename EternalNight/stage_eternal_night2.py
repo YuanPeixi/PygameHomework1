@@ -4,6 +4,33 @@ import math
 from framwork import GameFramework
 import os
 
+
+'''
+新结构设计
+STG:
+- Entity(递交Update (Update中用is_key_down更新),递交Draw(提供DC))
+(Move Speed,JudgeCircleSize,FallbackShape,HP)
+    - Player
+    - Enermy (Just Move Ups and Downs)
+
+PreStage (流星雨)
+FinalStage (纯粹的弹幕地狱)
+(需要支持:直线子弹即可中间、左右、和限位(圆形放置))
+对话 (直接暂停游戏)
+
+子弹设定
+
+流程:
+    - 初始化实例
+    - 循环更新
+    - 轮流绘制:
+        Background,Bullet
+        Character
+        HUB
+    
+'''
+
+
 class TouhouStage(GameFramework):
     """
     保留原版行为、体验兼容，同时使用新框架的 update()/draw() 分离与非阻塞 end 处理。
