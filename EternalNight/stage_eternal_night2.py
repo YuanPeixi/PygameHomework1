@@ -34,6 +34,7 @@ class TouhouStage(GameFramework):
         # images (loaded in load_images())
         self.reimu_img = None
         self.junko_img = None
+        self.background= None
 
         self.load_images()
         self.reset()
@@ -66,6 +67,10 @@ class TouhouStage(GameFramework):
         except Exception:
             self.junko_img = pygame.Surface((64,64), pygame.SRCALPHA)
             pygame.draw.rect(self.junko_img, (220,80,80), (0,0,64,64))
+        try:
+            self.background=pygame.image.load("EternalNight\\Muki.jpg")
+        except Exception:
+            pass
 
     def reset(self):
         # 初始化或重置游戏状态（与原 reset 行为等价）
@@ -283,7 +288,11 @@ class TouhouStage(GameFramework):
     def draw(self):
 
         # background
-        self.screen.fill((10, 0, 40))
+        #self.screen.fill((10, 0, 40))
+        if self.background != None:
+            self.screen.blit(self.background,(0,0))
+        else:
+            self.screen.fill((10,0,40))
 
         # boss
         self.screen.blit(self.junko_img, (self.enemy_x, self.enemy_y))

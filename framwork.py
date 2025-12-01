@@ -32,6 +32,27 @@ class GameFramework:
         text_surf = font_obj.render(text, True, color)
         self.screen.blit(text_surf, pos)
         
+    def image_out(self, image, pos, size=None, center=False, alpha=None):
+        """
+        统一图片绘制接口
+        - image: pygame.Surface 图片对象
+        - pos: (x, y) 左上角坐标或中心坐标(center=True 时)
+        - size: (宽, 高); 如果指定则自动缩放,否则保持图片原尺寸
+        - center: 如果为True,pos为图片中心;否则为左上角
+        - alpha: 若指定,设置整体不透明度(0-255)
+        """
+        surf = image
+        if size is not None:
+            surf = pygame.transform.smoothscale(image, size)
+        if alpha is not None and (0 <= alpha <= 255):
+            surf = surf.copy()
+            surf.set_alpha(alpha)
+        if center:
+            rect = surf.get_rect(center=pos)
+        else:
+            rect = surf.get_rect(topleft=pos)
+        self.screen.blit(surf, rect)
+
     def on_mouse_down(self,point,button):
         pass
     def on_mouse_move(self,point):
@@ -207,7 +228,8 @@ class GameManager:
         pygame.init()
         self.width=800
         self.height=600
-        self.games=[MainMenu()]
+        #self.games=[MainMenu()]
+        self.games=[]
         self.running=False
         self.score=0
         self.target=0 #The running game
