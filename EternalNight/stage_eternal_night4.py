@@ -31,11 +31,15 @@ class TouhouStage(GameFramework):
         self.fail = False
         self.pause = False
 
+        self.prestage=True
+        self.talk=False
+        self.talk_cnt=0
+
         # images (loaded in load_images())
         self.reimu_img = None
         self.junko_img = None
         self.background= None
-
+        #sounds
         self.sounds={}
 
         self.load_images()
@@ -118,7 +122,7 @@ class TouhouStage(GameFramework):
     def run(self):
         # 每次 run 都重置状态并调用框架的 run()
         self.reset()
-        pygame.mixer.Sound("./EternalNight/th15_12.mp3").play()
+        pygame.mixer.Sound("./EternalNight/th15_13.mp3").play()
         super().run()
 
     # ------------- input: ex 版本可以获得原始 event（推荐使用） -------------
@@ -149,6 +153,24 @@ class TouhouStage(GameFramework):
         # 帧锁 / 固定帧率由框架统一控制（不要再在 update 中调用 clock.tick）
         if self.pause:
             return
+
+        if self.talk:
+            '''
+            R 纯狐你不是绀珠传里面的吗？ 怎么跑到永夜抄来了
+            J 永夜抄不是在月球打的吗？ 我也在月球
+            J 而且作者说我的弹幕很纯粹
+            J 无需多言 速速动手
+            '''
+            if self.talk_cnt >=20:
+                pass
+            if self.talk_cnt>=(2+10)*60:
+                "如你所见, 我们在《东方永夜抄》里, 不过是Python版本"
+            if self.talk_cnt>=(2+2)*60:
+                "这还是幻想乡吗?"
+            if self.talk_cnt >=2*60:
+                "给我干哪来了?"
+                pass
+            self.talk_cnt+=1
 
         # 如果已经 finished（胜利/失败展示中），我们仍然要更新计时器以实现自动返回
         if self.finished:
