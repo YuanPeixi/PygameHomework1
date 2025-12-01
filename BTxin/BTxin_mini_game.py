@@ -14,13 +14,16 @@ RIGHT = (1, 0)
 class su(GameFramework):
     def __init__(self, width=800, height=600):
         super().__init__("BTxin", width, height)
+
+        self.path_prefix='.' #Fix for Python:Run Project
+
         # self.score_tempmanager = ScoreManager()
         # self.is_scoremanager = True
         self.score = 0
         # 音效
         pg.mixer.init()
-        self.boss_hit_sound = pg.mixer.Sound("PygameHomework1/BTxin/homo2.wav")
-        self.player_death_sound = pg.mixer.Sound("PygameHomework1/BTxin/homo.wav")
+        self.boss_hit_sound = pg.mixer.Sound(self.path_prefix+"/BTxin/homo2.wav")
+        self.player_death_sound = pg.mixer.Sound(self.path_prefix+"/BTxin/homo.wav")
         # 球的初始位置
         self.center = [width // 2, height // 2]
         # 初始方向
@@ -42,7 +45,7 @@ class su(GameFramework):
         self.rotation_step_deg = 4
         self.current_angle = math.atan2(-self.direction[1], self.direction[0])
 
-        self.pic = ['PygameHomework1/BTxin/homo1.png', 'PygameHomework1/BTxin/homo2.png', 'PygameHomework1/BTxin/homo3.png', 'PygameHomework1/BTxin/homo4.png']
+        self.pic = [self.path_prefix+'/BTxin/homo1.png', self.path_prefix+'/BTxin/homo2.png', self.path_prefix+'/BTxin/homo3.png', self.path_prefix+'/BTxin/homo4.png']
         self.images = [pg.image.load(p).convert_alpha() for p in self.pic]
         self.image_index = 0  # 照片编号
         self.image_timer = 0
@@ -71,6 +74,7 @@ class su(GameFramework):
         # boss
         self.boss = Boss(self.width, self.height)
         self.attackitem = attackitem(self.width, self.height)
+
 
     def set_image(self, idx, duration=None):
         if idx < 0 or idx >= len(self.images):
@@ -383,6 +387,7 @@ class su(GameFramework):
                     self.player_death_sound.stop()
                 except Exception:
                     pass
+            self.end()
         return super().on_key_down(key)
         
 
