@@ -63,8 +63,20 @@ class TouhouStage(GameFramework):
         self.junko_img = None
         self.background= None
 
+        self.sounds={}
+
         self.load_images()
+        self.load_sound()
         self.reset()
+
+    def load_sound(self):
+        pygame.mixer.init()
+        self.sounds["biu"]=pygame.mixer.Sound("./EternalNight/biu.wav")
+        self.sounds["boss_defeated"]=pygame.mixer.Sound("./EternalNight/boss_defeated.wav")
+        self.sounds["bullet_beep"]=pygame.mixer.Sound("./EternalNight/bullet_beep.wav")
+        self.sounds["explosure"]=pygame.mixer.Sound("./EternalNight/explosure.wav")
+        self.sounds["pick_pic"]=pygame.mixer.Sound("./EternalNight/pick_pic.wav")
+        self.sounds["spellcard_start"]=pygame.mixer.Sound("./EternalNight/spellcard_start.wav")
 
     def load_images(self):
         # 尝试加载资源，若不存在则使用占位图，避免因文件缺失而崩溃
@@ -128,9 +140,12 @@ class TouhouStage(GameFramework):
         self.finish_auto_seconds = 5  # 自动返回菜单秒数（与原近似）
         self._auto_exit_requested = False
 
+        pygame.mixer.stop()
+
     def run(self):
         # 每次 run 都重置状态并调用框架的 run()
         self.reset()
+        pygame.mixer.Sound("./EternalNight/th15_12.mp3").play()
         super().run()
 
     # ------------- input: ex 版本可以获得原始 event（推荐使用） -------------
@@ -271,6 +286,9 @@ class TouhouStage(GameFramework):
                     hit = True
                     break
 
+        if hit:
+            self.sounds["biu"].play()
+
         if hit and self.hero_alive:
             self.life -= 1
             if self.life > 0:
@@ -404,6 +422,10 @@ class TouhouStage(GameFramework):
             self.score = 10000 + self.life*1000 + time_bonus
 
     def _on_win(self):
+        self.sounds["boss_defeated"].play()
+        self.sounds["explosure"].play()
+        self.sounds["pick_pic"].play()
+
         # mark finished state, but don't block — draw() will show overlay
         if self.finished:
             return
@@ -425,6 +447,8 @@ class TouhouStage(GameFramework):
     def _finalize_and_exit(self):
         # finalize and stop running — call super().end() which will cause loop() to return self.score
         if self.running:
+            pygame.mixer.stop()
+
             # ensure final score is computed
             self.get_final_score()
             # stop the game loop (non-blocking)
@@ -432,7 +456,9 @@ class TouhouStage(GameFramework):
 
     # maintain compatibility of on_focus handlers if needed
     def on_focus_loss(self):
+        pygame.mixer.pause()
         self.pause = True
         # optionally show pause indicator (draw handles this)
     def on_focus_get(self):
+        pygame.mixer.unpause()
         self.pause = False

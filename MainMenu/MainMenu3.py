@@ -97,6 +97,9 @@ class MainMenu3(GameFramework):
         else:
             self.text_out("←/→切换视图 鼠标选择游戏 Enter/点击游戏图标进入    Esc退出", (self.width-740, self.height-36), 22, (255,255,255))
 
+        #y右上角 分数
+        self.text_out(f"Score:{self.score}",(self.width-150,40))
+
     def _draw_grid_menu(self, mx, my):
         # 海报格子 3 列，排版
         cols = 4
