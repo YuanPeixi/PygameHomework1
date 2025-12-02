@@ -3,7 +3,7 @@ import ScoreBoard
 from ScoreManager import *
 import GuessNumber.GuessNumber as GuessNumber
 import Snake.snake as snake
-import EternalNight.stage_eternal_night2 as stage_eternal_night
+import EternalNight.stage_eternal_night4 as stage_eternal_night
 from BTxin.BTxin_mini_game import su
 from MainMenu.MainMenu3 import *
 
