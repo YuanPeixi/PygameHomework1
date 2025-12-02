@@ -34,12 +34,13 @@ if __name__=="__main__":
     BTxin_mini_game=su()
     pygame.display.quit()
     #game_manger.games[0]=MainMenu()
-    game_manger.register_game(ScoreBoard.ScoreBoard(score_manager))
 
     game_manger.register_game(snake.Snake())
     game_manger.register_game(stage_eternal_night.TouhouStage())
     game_manger.register_game(GuessNumber.GuessNumber())
     game_manger.register_game(BTxin_mini_game)
+    
+    game_manger.register_game(ScoreBoard.ScoreBoard(score_manager))
     game_manger.run()
     
     score_manager.append_score("",game_manger.loop())

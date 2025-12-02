@@ -11,7 +11,8 @@ class MainMenu3(GameFramework):
     - 鼠标悬浮时，封面产生自下而上的白色动画，并显示游戏名
     - 鼠标点击游戏即可启动
     """
-    def __init__(self, width=900, height=600, covers_dir="./MainMenu/covers"):
+    def __init__(self, width=1000, height=600, covers_dir="./MainMenu/covers"):
+        # 默认宽度2000，适合10个格子横排
         super().__init__("MainMenu", width, height)
         self.games = []  # [(name, game实例)]
         self.selected_idx = 0  # 键盘选中
@@ -47,9 +48,9 @@ class MainMenu3(GameFramework):
             fn = f"{self.covers_dir}/{i+1:02d}.jpg"
             if os.path.exists(fn):
                 im = pygame.image.load(fn).convert()
-                im = pygame.transform.smoothscale(im, (180, 240))
+                im = pygame.transform.smoothscale(im, (90, 120))
             else:
-                im = pygame.Surface((180,240))
+                im = pygame.Surface((90,120))
                 im.fill((200, 200, 200))
                 pygame.draw.rect(im, (120,120,120), im.get_rect(), 4)
             self.cover_images.append(im)
@@ -91,21 +92,20 @@ class MainMenu3(GameFramework):
         else:
             self._draw_list_menu(mx, my)
 
-        # 右下角 说明
-        if self.background==None:
-            self.text_out("←/→切换视图 鼠标选择游戏 Enter/点击游戏图标进入    Esc退出", (self.width-740, self.height-36), 22, (180,200,220))
-        else:
-            self.text_out("←/→切换视图 鼠标选择游戏 Enter/点击游戏图标进入    Esc退出", (self.width-740, self.height-36), 22, (255,255,255))
+        # 右下角 说明，增加榜单说明
+        help_text = "←/→切换视图 鼠标选择游戏 Enter/点击游戏图标进入    Esc退出    B:查看榜单"
+        color = (180,200,220) if self.background==None else (255,255,255)
+        self.text_out(help_text, (self.width-900, self.height-36), 22, color)
 
-        #y右上角 分数
+        # 右上角 分数
         self.text_out(f"Score:{self.score}",(self.width-150,40))
 
     def _draw_grid_menu(self, mx, my):
-        # 海报格子 3 列，排版
-        cols = 4
-        cell_w, cell_h = 195, 285
-        margin_x, margin_y = 50, 96
-        grid_x0, grid_y0 = 50, 90
+        # 海报格子 10 列，排版
+        cols = 5
+        cell_w, cell_h = 100, 140  # 每个格子宽高
+        margin_x, margin_y = 20, 40
+        grid_x0, grid_y0 = 30, 90
         # 所有格子的 rect 区域和映射
         self.grid_rects = []
         for idx, (gamename, _) in enumerate(self.games):
@@ -114,7 +114,7 @@ class MainMenu3(GameFramework):
             x = grid_x0 + col * cell_w + margin_x
             y = grid_y0 + row * cell_h + margin_y
 
-            rect = pygame.Rect(x, y, 180, 240)
+            rect = pygame.Rect(x, y, 90, 120)
             self.grid_rects.append(rect)
             # 封面
             img = self.cover_images[idx] if idx < len(self.cover_images) else self.cover_images[0]
@@ -135,12 +135,12 @@ class MainMenu3(GameFramework):
             # 悬浮时动态白色遮罩和游戏名
             ani = self.grid_ani_progress[idx]
             if ani > 0.01:
-                ani_height = int(ani * 85)
-                cover = pygame.Surface((180, ani_height), pygame.SRCALPHA)
+                ani_height = int(ani * 45)
+                cover = pygame.Surface((90, ani_height), pygame.SRCALPHA)
                 cover.fill((255,255,255, min(200, int(230*ani))))
-                self.screen.blit(cover, (x, y+240-ani_height))
+                self.screen.blit(cover, (x, y+120-ani_height))
                 if ani>0.7:
-                    self.text_out(gamename, (x+32, y+240-ani_height+12), 22, (24,28,60))
+                    self.text_out(gamename, (x+8, y+120-ani_height+6), 14, (24,28,60))
 
     def _draw_list_menu(self, mx, my):
         starty = 110
@@ -210,6 +210,11 @@ class MainMenu3(GameFramework):
             self.selected_idx = max(self.selected_idx-1, 0)
         if key == pygame.K_RETURN or key==pygame.K_KP_ENTER:
             self.end()
+        # B键触发榜单
+        if key == pygame.K_b:
+            if hasattr(self, 'show_scoreboard'):
+                self.score=len(self.games)
+                self.end()
         super().on_key_down(key)
 
     def end(self):
