@@ -27,8 +27,8 @@ if __name__=="__main__":
     game_manger=GameManager()
     score_manager=ScoreManager()
     screen=pygame.display.set_mode((600,600))
-    #while not score_manager.isLogined():
-    #    score_manager.login(screen)
+    while not score_manager.isLogined():
+        score_manager.login(screen)
     game_manger.register_game(MainMenu3())
     game=TestGame()
     BTxin_mini_game=su()
