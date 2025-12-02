@@ -32,8 +32,9 @@ class TouhouStage(GameFramework):
         self.pause = False
 
         self.prestage=True
-        self.talk=False
-        self.talk_cnt=0
+        self.reimu_talk_img=None
+        self.junko_talk_img=None
+        self.prev_cnt=0
 
         # images (loaded in load_images())
         self.reimu_img = None
@@ -148,29 +149,47 @@ class TouhouStage(GameFramework):
         if self.finished:
             self._finalize_and_exit()
 
+    def enermy_shoot(self):
+        # spiral bullets
+            for i in range(6):
+                angle = (self.framecnt * 2 + i * 60) % 360
+                rads = angle * math.pi / 180
+                dx = self.enemy_bullet_speed * math.cos(rads)
+                dy = self.enemy_bullet_speed * math.sin(rads)
+                self.enemy_bullets.append([self.enemy_x+32, self.enemy_y+48, dx, dy])
+            # tracking bullet
+            cx, cy = self.enemy_x+32, self.enemy_y+48
+            tx, ty = self.hero_x+24, self.hero_y+24
+            vlen = ((tx-cx)**2 + (ty-cy)**2) ** 0.5
+            if vlen == 0:
+                vlen = 1
+            dx = self.enemy_bullet_speed * (tx-cx)/vlen
+            dy = self.enemy_bullet_speed * (ty-cy)/vlen
+            self.enemy_bullets.append([cx, cy, dx, dy])
+
+    def enermy_check(self):
+        boss_rect = pygame.Rect(self.enemy_x+8, self.enemy_y+8, 48, 48)
+        for b in self.bullets[:]:
+            if boss_rect.collidepoint(b[0], b[1]):
+                self.enemy_hp -= 1
+                try:
+                    self.bullets.remove(b)
+                except ValueError:
+                    pass
+                self.score += 10
+
     # ------------- logic update（不绘制） -------------
     def update(self):
         # 帧锁 / 固定帧率由框架统一控制（不要再在 update 中调用 clock.tick）
         if self.pause:
             return
-
-        if self.talk:
-            '''
-            R 纯狐你不是绀珠传里面的吗？ 怎么跑到永夜抄来了
-            J 永夜抄不是在月球打的吗？ 我也在月球
-            J 而且作者说我的弹幕很纯粹
-            J 无需多言 速速动手
-            '''
-            if self.talk_cnt >=20:
-                pass
-            if self.talk_cnt>=(2+10)*60:
-                "如你所见, 我们在《东方永夜抄》里, 不过是Python版本"
-            if self.talk_cnt>=(2+2)*60:
-                "这还是幻想乡吗?"
-            if self.talk_cnt >=2*60:
-                "给我干哪来了?"
-                pass
-            self.talk_cnt+=1
+        
+        self.prev_cnt+=1
+        if self.prev_cnt<5*60:
+            return #标题阶段
+        elif 5*60<self.prev_cnt<=35*60:
+            #放入流星雨
+            self.enemy_bullets.append([0,0,self.enemy_bullet_speed/math.sqrt(2),self.enemy_bullet_speed/math.sqrt(2)])
 
         # 如果已经 finished（胜利/失败展示中），我们仍然要更新计时器以实现自动返回
         if self.finished:
@@ -237,23 +256,9 @@ class TouhouStage(GameFramework):
         self.enemy_y = 100 + int(30 * math.sin(self.framecnt/50))
 
         # enemy shooting pattern
-        if self.framecnt % 28 == 0 and self.hero_alive:
-            # spiral bullets
-            for i in range(6):
-                angle = (self.framecnt * 2 + i * 60) % 360
-                rads = angle * math.pi / 180
-                dx = self.enemy_bullet_speed * math.cos(rads)
-                dy = self.enemy_bullet_speed * math.sin(rads)
-                self.enemy_bullets.append([self.enemy_x+32, self.enemy_y+48, dx, dy])
-            # tracking bullet
-            cx, cy = self.enemy_x+32, self.enemy_y+48
-            tx, ty = self.hero_x+24, self.hero_y+24
-            vlen = ((tx-cx)**2 + (ty-cy)**2) ** 0.5
-            if vlen == 0:
-                vlen = 1
-            dx = self.enemy_bullet_speed * (tx-cx)/vlen
-            dy = self.enemy_bullet_speed * (ty-cy)/vlen
-            self.enemy_bullets.append([cx, cy, dx, dy])
+        if self.prev_cnt>60*60:
+            if self.framecnt % 28 == 0 and self.hero_alive:
+                self.enermy_shoot()
 
         # enemy bullets movement
         for eb in self.enemy_bullets[:]:
@@ -302,15 +307,8 @@ class TouhouStage(GameFramework):
                 return
 
         # boss collision with player's bullets
-        boss_rect = pygame.Rect(self.enemy_x+8, self.enemy_y+8, 48, 48)
-        for b in self.bullets[:]:
-            if boss_rect.collidepoint(b[0], b[1]):
-                self.enemy_hp -= 1
-                try:
-                    self.bullets.remove(b)
-                except ValueError:
-                    pass
-                self.score += 10
+        if self.prev_cnt>60*60: #Prev Boss doesn't exist
+            self.enermy_check()
 
         # win condition
         if self.enemy_hp <= 0:
@@ -324,20 +322,7 @@ class TouhouStage(GameFramework):
         # keep score calculation for display moved to get_final_score/draw or when finished
         # no pygame.display.flip() here (framework will handle)
 
-    # ------------- drawing (rendering only) -------------
-    def draw(self):
-
-        # background
-        #self.screen.fill((10, 0, 40))
-        if self.background != None:
-            self.screen.blit(self.background,(0,0))
-        else:
-            self.screen.fill((10,0,40))
-
-        # boss
-        self.screen.blit(self.junko_img, (self.enemy_x, self.enemy_y))
-
-        # boss HP bar
+    def boss_hp_bar(self):
         barw = 320
         bx = (self.width - barw) // 2
         pygame.draw.rect(self.screen, (240, 48, 90), (bx, 32, barw, 16), 2)
@@ -346,6 +331,73 @@ class TouhouStage(GameFramework):
             pygame.draw.rect(self.screen, (240, 48, 90), (bx, 32, real_w, 16))
         self.text_out("Boss", (bx+barw+10, 30), 22, (255, 90, 130))
         self.text_out(f"{int(100*self.enemy_hp/self.enemy_maxhp)}%", (bx+barw+70, 30), 22, (255,200,200))
+
+    def say(self,name,word):
+        if name=="reimu":
+            if self.reimu_talk_img==None:
+                self.reimu_talk_img=pygame.image.load(".\\EternalNight\\reimu1.png")
+            adapt_size=self.reimu_talk_img.get_size()
+            adapt_size=tuple(int(x*0.3) for x in adapt_size) 
+            self.image_out(self.reimu_talk_img,(self.width*0.25,self.height*0.6),adapt_size,True)
+            self.text_out(word,(self.width*0.3,self.height*0.7),25,(255,75,75))
+        if name=="junko":
+            if self.junko_talk_img==None:
+                self.junko_talk_img=pygame.image.load(".\\EternalNight\\junko1.png")
+            adapt_size=self.junko_talk_img.get_size()
+            adapt_size=tuple(int(x*0.3) for x in adapt_size) 
+            self.image_out(self.junko_talk_img,(self.width*0.75,self.height*0.6),adapt_size,True)
+            self.text_out(word,(self.width*0.3,self.height*0.7),20,(255,165,0))
+
+    # ------------- drawing (rendering only) -------------
+    def draw(self):
+        
+
+        # background
+        #self.screen.fill((10, 0, 40))
+        if self.background != None:
+            self.screen.blit(self.background,(0,0))
+        else:
+            self.screen.fill((10,0,40))
+        #debug
+        self.text_out(f"prev_cnt={self.prev_cnt}\nprev_sec={self.prev_cnt//60}",(0,0),10,(255,255,255))
+
+        if self.prev_cnt<5*60:
+            self.text_out("东方永夜抄",(self.width*0.1,self.height*0.4),80,(250,165,0))
+            self.text_out("灵梦和纯狐的奇妙Python冒险",(self.width*0.1,self.height*0.6),30,(250,100,100))
+            return
+        
+        #talk
+        if 35*60<self.prev_cnt<=40*60:
+            self.enemy_bullets.clear()
+            #self.text_out()
+
+        # boss
+        if self.prev_cnt>=35*60:
+            self.screen.blit(self.junko_img, (self.enemy_x, self.enemy_y))
+
+        
+        if 35*60<self.prev_cnt<=40*60:
+            self.say("reimu","给我干哪来了, 这还是幻想乡吗?")
+            return
+        elif 40*60<self.prev_cnt<=45*60:
+            self.say("junko","如你所见, 我们正在东方永夜抄里, 只不过是Python版本的")
+            return
+        elif 45*60<self.prev_cnt<=50*60:
+            self.say("reimu","纯狐你不是绀珠传里的吗?")
+            return
+        elif 50*60<self.prev_cnt<=55*60:
+            self.say("junko","我在月球上, 永夜抄也在月球上 , 这很正常")
+            return
+        elif 55*60<self.prev_cnt<=60*60:
+            self.say("junko","况且作者认为我的弹幕很“纯粹”\n适合展示")
+            return
+        elif 60*60<self.prev_cnt<=65*60:
+            self.say("junko","无需多言, 速速动手")
+            return
+
+        # boss HP bar
+        if self.prev_cnt>60*60:
+            self.boss_hp_bar()
 
         # enemy bullets
         for eb in self.enemy_bullets:
@@ -460,6 +512,8 @@ class TouhouStage(GameFramework):
 
 if __name__=="__main__":
     stage=TouhouStage()
+    #debug the talk directly
+    stage.prev_cnt=35*60+1
     pygame.font.init()
     stage.run()
     stage.loop()
