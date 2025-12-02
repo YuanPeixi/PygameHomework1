@@ -123,7 +123,7 @@ class TouhouStage(GameFramework):
     def run(self):
         # 每次 run 都重置状态并调用框架的 run()
         self.reset()
-        pygame.mixer.Sound("./EternalNight/th15_13.mp3").play()
+        pygame.mixer.Sound("./EternalNight/th15_12.mp3").play()
         super().run()
 
     # ------------- input: ex 版本可以获得原始 event（推荐使用） -------------
@@ -186,7 +186,6 @@ class TouhouStage(GameFramework):
         
         self.prev_cnt+=1
         if self.prev_cnt<5*60:
-            #pygame.mixer.
             return #标题阶段
         elif 5*60<self.prev_cnt<=35*60:
             #放入流星雨
@@ -211,6 +210,9 @@ class TouhouStage(GameFramework):
         elif 35*60<self.prev_cnt<=40*60:
             #对话阶段，无弹幕绘制，暂不画敌人
             self.enemy_bullets.clear()
+        if self.prev_cnt==60*60:
+            pygame.mixer.stop()
+            pygame.mixer.Sound("./EternalNight/th15_13.mp3").play()
 
         # 如果已经 finished（胜利/失败展示中），我们仍然要更新计时器以实现自动返回
         if self.finished:
@@ -399,23 +401,27 @@ class TouhouStage(GameFramework):
             self.screen.blit(self.junko_img, (self.enemy_x, self.enemy_y))
 
         
-        if 35*60<self.prev_cnt<=40*60:
+        if 35*60<self.prev_cnt<=38*60:
             self.say("reimu","给我干哪来了, 这还是幻想乡吗?")
             return
-        elif 40*60<self.prev_cnt<=45*60:
-            self.say("junko","如你所见, 我们正在东方永夜抄里, 只不过是Python版本的")
+        elif 38*60<self.prev_cnt<=43*60:
+            self.say("junko","如你所见, 我们正在东方永夜抄里")
+            self.text_out("只不过是Python版本的",(self.width*0.1,self.height*0.85),40,(255,165,0))
             return
-        elif 45*60<self.prev_cnt<=50*60:
+        elif 43*60<self.prev_cnt<=46*60:
             self.say("reimu","纯狐你不是绀珠传里的吗?")
             return
-        elif 50*60<self.prev_cnt<=55*60:
-            self.say("junko","我在月球上, 永夜抄也在月球上 , 这很正常")
+        elif 46*60<self.prev_cnt<=51*60:
+            self.say("junko","我在月球上, 永夜抄也在月球上")
+            self.text_out("这很正常",(self.width*0.1,self.height*0.85),40,(255,165,0))
             return
-        elif 55*60<self.prev_cnt<=60*60:
-            self.say("junko","况且作者认为我的弹幕很“纯粹” \n 适合展示")
+        elif 51*60<self.prev_cnt<=56*60:
+            self.say("junko","况且作者认为我的弹幕很“纯粹”")
+            self.text_out("适合展示",(self.width*0.1,self.height*0.85),40,(255,165,0))
             return
-        elif 60*60<self.prev_cnt<=65*60:
-            self.say("junko","无需多言, 速速动手")
+        elif 56*60<self.prev_cnt<=60*60:
+            self.say("junko","")
+            self.text_out("无需多言,速速动手",(self.width*0.1,self.height*0.85),40,(255,165,0))
             return
 
         # boss HP bar
@@ -423,8 +429,12 @@ class TouhouStage(GameFramework):
             self.boss_hp_bar()
 
         # enemy bullets
-        for eb in self.enemy_bullets:
-            pygame.draw.circle(self.screen, (255,70,160), (int(eb[0]), int(eb[1])), 8)
+        if self.prev_cnt>60*60:
+            for eb in self.enemy_bullets:
+                pygame.draw.circle(self.screen, (255,70,160), (int(eb[0]), int(eb[1])), 8)
+        else:
+            for eb in self.enemy_bullets:
+                pygame.draw.circle(self.screen, (200, 220, 255), (int(eb[0]), int(eb[1])), 6)
 
         # player bullets
         for b in self.bullets:
