@@ -186,10 +186,31 @@ class TouhouStage(GameFramework):
         
         self.prev_cnt+=1
         if self.prev_cnt<5*60:
+            #pygame.mixer.
             return #标题阶段
         elif 5*60<self.prev_cnt<=35*60:
             #放入流星雨
-            self.enemy_bullets.append([0,0,self.enemy_bullet_speed/math.sqrt(2),self.enemy_bullet_speed/math.sqrt(2)])
+            # 每 20 帧生成一组（可调）
+            if self.framecnt % 20 == 0:
+            # 选定一个x坐标
+                x = random.randint(30, self.width - 30)
+                # 生成一束流星：比如5颗纵向，y坐标间隔一致
+                for j in range(5):  # 5颗一束
+                    y_offset = -j*30    # 间距30像素逐帧入场
+                    speed = self.enemy_bullet_speed + random.uniform(-0.5,0.5)
+                    self.enemy_bullets.append([x, y_offset, 0, speed])
+                # 偶尔生成斜向流星
+                if random.random() < 0.20:
+                    edge = random.choice(['left', 'right'])
+                    y = random.randint(0, int(self.height*0.5))
+                    dx = random.uniform(2, 3)
+                    if edge == 'left':
+                        self.enemy_bullets.append([0, y, dx, random.uniform(3, 4)])
+                    else:
+                        self.enemy_bullets.append([self.width, y, -dx, random.uniform(3, 4)])
+        elif 35*60<self.prev_cnt<=40*60:
+            #对话阶段，无弹幕绘制，暂不画敌人
+            self.enemy_bullets.clear()
 
         # 如果已经 finished（胜利/失败展示中），我们仍然要更新计时器以实现自动返回
         if self.finished:
@@ -339,14 +360,16 @@ class TouhouStage(GameFramework):
             adapt_size=self.reimu_talk_img.get_size()
             adapt_size=tuple(int(x*0.3) for x in adapt_size) 
             self.image_out(self.reimu_talk_img,(self.width*0.25,self.height*0.6),adapt_size,True)
-            self.text_out(word,(self.width*0.3,self.height*0.7),25,(255,75,75))
+            #self.text_out(word,(self.width*0.3,self.height*0.7),25,(255,75,75))
+            self.text_out(word,(self.width*0.1,self.height*0.7),40,(255,75,75))
         if name=="junko":
             if self.junko_talk_img==None:
                 self.junko_talk_img=pygame.image.load(".\\EternalNight\\junko1.png")
             adapt_size=self.junko_talk_img.get_size()
             adapt_size=tuple(int(x*0.3) for x in adapt_size) 
             self.image_out(self.junko_talk_img,(self.width*0.75,self.height*0.6),adapt_size,True)
-            self.text_out(word,(self.width*0.3,self.height*0.7),20,(255,165,0))
+            #self.text_out(word,(self.width*0.3,self.height*0.7),25,(255,165,0))
+            self.text_out(word,(self.width*0.1,self.height*0.7),40,(255,165,0))
 
     # ------------- drawing (rendering only) -------------
     def draw(self):
@@ -359,7 +382,7 @@ class TouhouStage(GameFramework):
         else:
             self.screen.fill((10,0,40))
         #debug
-        self.text_out(f"prev_cnt={self.prev_cnt}\nprev_sec={self.prev_cnt//60}",(0,0),10,(255,255,255))
+        self.text_out(f"prev_cnt={self.prev_cnt} \n prev_sec={self.prev_cnt//60}",(0,0),10,(255,255,255))
 
         if self.prev_cnt<5*60:
             self.text_out("东方永夜抄",(self.width*0.1,self.height*0.4),80,(250,165,0))
@@ -389,7 +412,7 @@ class TouhouStage(GameFramework):
             self.say("junko","我在月球上, 永夜抄也在月球上 , 这很正常")
             return
         elif 55*60<self.prev_cnt<=60*60:
-            self.say("junko","况且作者认为我的弹幕很“纯粹”\n适合展示")
+            self.say("junko","况且作者认为我的弹幕很“纯粹” \n 适合展示")
             return
         elif 60*60<self.prev_cnt<=65*60:
             self.say("junko","无需多言, 速速动手")
@@ -513,7 +536,7 @@ class TouhouStage(GameFramework):
 if __name__=="__main__":
     stage=TouhouStage()
     #debug the talk directly
-    stage.prev_cnt=35*60+1
+    #stage.prev_cnt=35*60+1
     pygame.font.init()
     stage.run()
     stage.loop()
