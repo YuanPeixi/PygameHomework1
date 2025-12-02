@@ -3,11 +3,11 @@
 本项目为Pygame框架下的综合小游戏与排行榜系统集合。你可以通过启动器选择不同游戏、查看排行榜、体验自定义关卡，并支持分数统计与用户名登记。
 
 ## 项目说明
-- 现在项目正在修改目录规划
-    - framework.py
-    - launcher.py
-    - rank.xml
-    - Game1
+- 项目的目录规划
+    - framwork.py   #框架
+    - launcher.py   #启动器
+    - rank.xml      #分数记录
+    - Game1         #游戏文件夹
     - Game2
     - ...
 
@@ -21,13 +21,19 @@
 **核心类及方法：**
 
 - `GameFramework`：所有自定义游戏都应继承此类，实现 `update()` 和事件处理。
-    - `run()`：初始化并打开窗口、准备游戏。
-    - `loop()`：主循环，每帧分发输入及刷新界面，退出循环时返回该轮得分（`self.score`）。
-    - `on_key_down(key)` / `on_key_up(key)` / `on_mouse_down(pos,btn)` / ... ：可覆写用于自定义输入事件。
-    - `text_out(text, pos, size, color, font)`：便捷文本绘制，支持直接渲染中文。
-    - `update()`：主要帧间更新
-    - `draw()`：帧绘制
-    - `end()`：安全退出本轮，推荐在游戏结束条件调用。
+    - *方法说明：*
+    - - `run()`：初始化并打开窗口、准备游戏。
+    - -  `loop()`：主循环，每帧分发输入及刷新界面，退出循环时返回该轮得分（`self.score`）。
+    - -  `on_key_down(key)` / `on_key_up(key)` / `on_mouse_down(pos,btn)` / ... ：可覆写用于自定义输入事件。
+    - -  `text_out(text, pos, size, color, font)`：便捷文本绘制，支持直接渲染中文。
+    - -  `image_out(image,pos,size,center,alpha)`：便捷图片绘制
+    - - `is_key_down(key)`：检测特定按键是否按下(可用于update()中)
+    - - `on_mouse_..._ex(...)` / `on_key_..._ex(...)`：包含原始event的高级事件分发 （务必调用父类函数保证消息传递正常）
+    - -  `update()`：主要帧间更新
+    - -  `draw()`：帧绘制
+    - -  `end()`：安全退出本轮，推荐在游戏结束条件调用。
+    - *属性说明：*
+    - - `self.score` 游戏计分，及时更新，退出时会自动递交GameManager
 
 - `MainMenu(GameFramework)`：游戏选择菜单，负责展示所有已注册小游戏名称，响应数字键切换游戏。
 
@@ -67,7 +73,9 @@ if __name__=="__main__":
     game_manger.run()
     score_manager.append_score("", game_manger.loop())
 ```
-> 你可根据实际需要增减游戏类及排行榜模块。
+> 你可根据实际需要增减游戏类及排行榜模块。<br>
+> 通常情况下自定义游戏的开发者不需要直接使用`ScoreManager`而是直接调用`end()`即可<br>
+> 如果你希望你的游戏独立显示分数,你也可以单独使用`ScoreManager`的`append_score()`<br>
 
 ### 3. `snake.py` 文件解析
 
@@ -113,6 +121,29 @@ class Snake(GameFramework):
 1. 新建文件继承 `GameFramework`。
 2. 实现基本的 `update()`（游戏主逻辑）和输入处理函数。
 3. 在 `launcher.py` 通过 `manager.register_game(YourGame())` 注册。
+
+---
+
+## 最小游戏要求
+1. 至少要重写`update()`和`draw()` (`__init__`通常也应重写)
+2. 在结束时调用`end()`或重载`loop()`(手动返回分数并清理资源等)
+3. 注意：应该记得在`run()`中初始化你的`mixer`等并在调用`end()`前停止
+
+## 最小启动指引
+有时候为了调试方便，你可以暂时停用计分板(修改launcher.py)
+```python
+#while not score_manager.isLogined():
+#        score_manager.login(screen)
+```
+此外，框架被设计成可以从游戏直接启动(比如直接从snake.py启动)
+```python
+#在snake.py中添加
+if __name__ == "__main__":
+    snake=Snake()
+    snake.run()
+    snake.loop()
+```
+(有时候会提示framwork.py缺失,将其复制一份到snake.py同侧就行)
 
 ---
 
