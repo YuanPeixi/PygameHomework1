@@ -6,6 +6,9 @@ import Snake.snake as snake
 import EternalNight.stage_eternal_night4 as stage_eternal_night
 from BTxin.BTxin_mini_game import su
 from MainMenu.MainMenu3 import *
+from BlackJack.BlackJack import Blackjack
+from Maze.maze import MazeGame
+from MemoryNum.memory_number_game import MemoryNumberGame
 
 class TestGame(GameFramework):
     def __init__(self,width=800,height=600):
@@ -39,6 +42,9 @@ if __name__=="__main__":
     game_manger.register_game(stage_eternal_night.TouhouStage())
     game_manger.register_game(GuessNumber.GuessNumber())
     game_manger.register_game(BTxin_mini_game)
+    game_manger.register_game(Blackjack())
+    game_manger.register_game(MazeGame())
+    game_manger.register_game(MemoryNumberGame())
     
     game_manger.register_game(ScoreBoard.ScoreBoard(score_manager))
     game_manger.run()

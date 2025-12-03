@@ -21,6 +21,8 @@ class GameFramework:
 
     def _get_font(self, font_name, size):
         """Get or create a cached font object."""
+        if not pygame.font.get_init():
+            pygame.font.init()
         key = (font_name, size)
         if key not in self._fonts:
             self._fonts[key] = pygame.font.SysFont(font_name, size)

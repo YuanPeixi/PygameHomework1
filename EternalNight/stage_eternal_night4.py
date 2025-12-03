@@ -14,7 +14,7 @@ class TouhouStage(GameFramework):
     """
 
     def __init__(self, width=800, height=600):
-        super().__init__("东方永夜抄·样例关", width, height)
+        super().__init__("东方永夜抄", width, height)
         # game parameters (与原版保持相同)
         self.hero_speed = 6
         self.bullet_speed = 12

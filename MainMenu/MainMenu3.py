@@ -212,9 +212,10 @@ class MainMenu3(GameFramework):
             self.end()
         # B键触发榜单
         if key == pygame.K_b:
-            if hasattr(self, 'show_scoreboard'):
-                self.score=len(self.games)
-                self.end()
+            for game in self.games:
+                if game[0] == "ScoreBoard" or game[0]=="排行榜":
+                    self.selected_idx = self.games.index(game)
+                    self.end()
         super().on_key_down(key)
 
     def end(self):

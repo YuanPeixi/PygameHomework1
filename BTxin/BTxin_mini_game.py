@@ -13,7 +13,7 @@ RIGHT = (1, 0)
 
 class su(GameFramework):
     def __init__(self, width=800, height=600):
-        super().__init__("BTxin", width, height)
+        super().__init__("HomoGame-BTxin", width, height)
 
         self.path_prefix='.' #Fix for Python:Run Project
 
