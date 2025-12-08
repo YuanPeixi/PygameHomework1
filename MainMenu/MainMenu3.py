@@ -48,9 +48,12 @@ class MainMenu3(GameFramework):
             fn = f"{self.covers_dir}/{i+1:02d}.jpg"
             if os.path.exists(fn):
                 im = pygame.image.load(fn).convert()
-                im = pygame.transform.smoothscale(im, (90, 120))
+                im = pygame.transform.smoothscale(im, (120, 120))
+            elif os.path.exists(fn.replace(".jpg", ".png")):
+                im = pygame.image.load(fn.replace(".jpg", ".png")).convert()
+                im = pygame.transform.smoothscale(im, (120, 120))
             else:
-                im = pygame.Surface((90,120))
+                im = pygame.Surface((120,120))
                 im.fill((200, 200, 200))
                 pygame.draw.rect(im, (120,120,120), im.get_rect(), 4)
             self.cover_images.append(im)
@@ -103,7 +106,8 @@ class MainMenu3(GameFramework):
     def _draw_grid_menu(self, mx, my):
         # 海报格子 10 列，排版
         cols = 5
-        cell_w, cell_h = 100, 140  # 每个格子宽高
+        #cell_w, cell_h = 100, 140  # 每个格子宽高
+        cell_w, cell_h = 140, 140  # 每个格子宽高
         margin_x, margin_y = 20, 40
         grid_x0, grid_y0 = 30, 90
         # 所有格子的 rect 区域和映射
@@ -136,7 +140,7 @@ class MainMenu3(GameFramework):
             ani = self.grid_ani_progress[idx]
             if ani > 0.01:
                 ani_height = int(ani * 45)
-                cover = pygame.Surface((90, ani_height), pygame.SRCALPHA)
+                cover = pygame.Surface((120, ani_height), pygame.SRCALPHA)
                 cover.fill((255,255,255, min(200, int(230*ani))))
                 self.screen.blit(cover, (x, y+120-ani_height))
                 if ani>0.7:

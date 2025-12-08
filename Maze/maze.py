@@ -168,7 +168,19 @@ class MazeGame(GameFramework):
             self.end()  # 框架要求
 
     def draw(self):
+        #画背景
         self.screen.fill(COLOR_BG)
+
+        if not self.running:
+            self.text_out(f"Your Score:{self.score}",(self.width*0.3,self.height*0.5),36)
+            #Set to fixed 2 bit float point
+            self.text_out(f"Time Usage:{self.game_end_time-self.game_start_time:.3} s",(self.width*0.3,self.height*0.6))
+            #直接暂停2s
+            pygame.display.flip()
+            time.sleep(2)
+            return
+            
+
         # 画迷宫
         for r, line in enumerate(MAZE_MAP):
             for c, x in enumerate(line):
