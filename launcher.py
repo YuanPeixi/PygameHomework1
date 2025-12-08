@@ -9,6 +9,7 @@ from MainMenu.MainMenu3 import *
 from BlackJack.BlackJack import Blackjack
 from Maze.maze import MazeGame
 from MemoryNum.memory_number_game import MemoryNumberGame
+from TicTacToe.tictactoe2 import TicTacToeGame
 
 class TestGame(GameFramework):
     def __init__(self,width=800,height=600):
@@ -45,6 +46,7 @@ if __name__=="__main__":
     game_manger.register_game(Blackjack())
     game_manger.register_game(MazeGame())
     game_manger.register_game(MemoryNumberGame())
+    game_manger.register_game(TicTacToeGame())
     
     game_manger.register_game(ScoreBoard.ScoreBoard(score_manager))
     game_manger.run()
